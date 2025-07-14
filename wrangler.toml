@@ -1,4 +1,4 @@
-name = "api"
+name = "apigivemysolback"
 main = "src/handler.js"
 compatibility_date = "2025-07-12"
 
