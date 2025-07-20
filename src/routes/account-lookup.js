@@ -28,6 +28,7 @@ export async function onRequestGet({ request, env }) {
 			zeroBalanceAccounts,
 			burnCandidateAccounts: BurnATA,
 			finalVerifiedAccounts,
+			verifiedMintCount,
 		} = classifyTokenAccounts(data?.tokenAccounts, metadata?.tokens);
 
 		const totalAccounts = data.count;
@@ -36,7 +37,7 @@ export async function onRequestGet({ request, env }) {
 
 		const result = {
 			rentPerAccountLamports,
-			totalAccounts,
+			totalAccounts: totalAccounts - verifiedMintCount,
 			zeroBalanceAccountsCount: zeroBalanceAccounts.length,
 			burnCandidateAccountsCount,
 			finalVerifiedAccountsCount: finalVerifiedAccounts.length,

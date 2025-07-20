@@ -20,20 +20,17 @@ const VERIFIED_MINTS = new Set([
  */
 
 function classifyTokenAccounts(tokenAccounts, metadata) {
-	const verifiedTokenAddresses = new Set(
-		Object.keys(metadata).filter((mint) => metadata[mint].reputation === "ok")
-	);
-
+	let verifiedMintCount = 0;
 	const zeroBalanceAccounts = [];
+	const verifiedAccounts = [];
 	const burnCandidateAccounts = {
 		ataOnly: [], // Contains only ATA addresses
 		fullData: [], // Contains full account objects
 	};
-	const verifiedAccounts = [];
 
 	for (const account of tokenAccounts) {
 		const amount = Number(account.amount);
-		const isVerified = verifiedTokenAddresses.has(account.tokenAddress);
+		const isVerified = account?.reputation === "ok";
 
 		if (isVerified) {
 			verifiedAccounts.push(account);
@@ -53,14 +50,19 @@ function classifyTokenAccounts(tokenAccounts, metadata) {
 		}
 	}
 
-	const finalVerifiedAccounts = verifiedAccounts.filter(
-		(account) => !VERIFIED_MINTS.has(account.tokenAddress)
-	);
+	const finalVerifiedAccounts = verifiedAccounts.filter((account) => {
+		if (VERIFIED_MINTS.has(account.tokenAddress)) {
+			verifiedMintCount++;
+			return false;
+		}
+		return true;
+	});
 
 	return {
 		zeroBalanceAccounts,
 		burnCandidateAccounts,
 		finalVerifiedAccounts,
+		verifiedMintCount,
 	};
 }
 
