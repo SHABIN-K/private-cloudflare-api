@@ -1,6 +1,6 @@
-import response from "../cache/res.json";
+import { rentPerAccountLamports } from "../utils";
+import { getBatchTokenAccounts } from "../helper/gettokenaccounts";
 import classifyTokenAccounts from "../helper/getClassifeidToken";
-import { spoofedHeaders, rentPerAccountLamports } from "../utils";
 
 export async function onRequestGet({ request, env }) {
 	const url = new URL(request.url);
@@ -9,44 +9,37 @@ export async function onRequestGet({ request, env }) {
 	if (!wallet) return new Response("Missing wallet address", { status: 400 });
 
 	try {
-		const solscanUrl = `https://api-v2.solscan.io/v2/account/tokenaccounts?address=${wallet}&page=1&page_size=480&type=token&hide_zero=false`;
+		const res = await getBatchTokenAccounts(wallet);
 
-		const response = await fetch(solscanUrl, {
-			method: "GET",
-			headers: spoofedHeaders,
-		});
+		const { tokenCount, tokens, metadata: ds } = res;
+		
+		return new Response(JSON.stringify({ Hel: "hello world" }));
 
-		if (!response.ok) {
-			return new Response("[API_ERROR_THIRD]", {
-				status: response.status,
-			});
-		}
-		// const { data, metadata } = response;
-		const { data, metadata } = await response.json();
+		// const { data, metadata } = res;
 
-		const {
-			zeroBalanceAccounts,
-			burnCandidateAccounts: BurnATA,
-			finalVerifiedAccounts,
-			verifiedMintCount,
-		} = classifyTokenAccounts(data?.tokenAccounts, metadata?.tokens);
+		// const {
+		// 	zeroBalanceAccounts,
+		// 	burnCandidateAccounts: BurnATA,
+		// 	finalVerifiedAccounts,
+		// 	verifiedMintCount,
+		// } = classifyTokenAccounts(data?.tokenAccounts, metadata?.tokens);
 
-		const totalAccounts = data.count;
-		const burnCandidateAccountsCount =
-			BurnATA.fullData.length + BurnATA.ataOnly.length;
+		// const totalAccounts = data.count;
+		// const burnCandidateAccountsCount =
+		// 	BurnATA.fullData.length + BurnATA.ataOnly.length;
 
-		const result = {
-			rentPerAccountLamports,
-			totalAccounts: totalAccounts - verifiedMintCount,
-			zeroBalanceAccountsCount: zeroBalanceAccounts.length,
-			burnCandidateAccountsCount,
-			finalVerifiedAccountsCount: finalVerifiedAccounts.length,
-			zeroBalanceAccounts,
-			BurnATA,
-			finalVerifiedAccounts,
-		};
+		// const result = {
+		// 	rentPerAccountLamports,
+		// 	totalAccounts: totalAccounts - verifiedMintCount,
+		// 	zeroBalanceAccountsCount: zeroBalanceAccounts.length,
+		// 	burnCandidateAccountsCount,
+		// 	finalVerifiedAccountsCount: finalVerifiedAccounts.length,
+		// 	zeroBalanceAccounts,
+		// 	BurnATA,
+		// 	finalVerifiedAccounts,
+		// };
 
-		return new Response(JSON.stringify(result));
+		// return new Response(JSON.stringify(result));
 	} catch (err) {
 		return new Response(
 			JSON.stringify({ error: "Internal server error", details: err.message }),
