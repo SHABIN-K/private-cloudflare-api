@@ -23,7 +23,7 @@ const getTokenAccounts = async (wallet, currentPage, pageSize) => {
 export const getBatchTokenAccounts = async (wallet) => {
 	let tokenCount = null;
 	let tokens = [];
-	let meta = [];
+	let meta = {};
 
 	let currentPage = 1;
 	let pageSize = 480;
@@ -37,8 +37,7 @@ export const getBatchTokenAccounts = async (wallet) => {
 		dataType = data?.data_type || "indexed";
 
 		tokens.push(...pageTokens);
-
-		if (metadata?.tokens) meta.push(...Object.values(metadata.tokens));
+		Object.assign(meta, metadata?.tokens);
 
 		if (pageTokens.length < pageSize) hasMore = false;
 
@@ -47,8 +46,9 @@ export const getBatchTokenAccounts = async (wallet) => {
 	}
 
 	return {
-		tokenCount,
-		tokens,
+		totalAccounts: tokenCount,
+		tokenAccounts: tokens,
 		metadata: meta,
+		currentPage
 	};
 };
