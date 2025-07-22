@@ -9,8 +9,9 @@ export async function onRequestGet({ request }) {
 	if (!wallet) return new Response("Missing wallet address", { status: 400 });
 
 	try {
-		const { totalAccounts, tokenAccounts, metadata } = await getBatchTokenAccounts(wallet);
-		
+		const { totalAccounts, tokenAccounts, metadata } =
+			await getBatchTokenAccounts(wallet);
+
 		const {
 			zeroBalanceAccounts,
 			burnCandidateAccounts: BurnATA,
@@ -18,20 +19,19 @@ export async function onRequestGet({ request }) {
 			verifiedMintCount,
 		} = classifyTokenAccounts(tokenAccounts, metadata);
 
-		const burnCandidateAccountsCount = BurnATA.fullData.length + BurnATA.ataOnly.length;
+		const burnTokenAccCount = BurnATA.fullData.length + BurnATA.ataOnly.length;
 		const hasMoreData = tokenAccounts.length < totalAccounts;
-
 
 		const result = {
 			rentPerAccountLamports,
 			totalAccounts: totalAccounts - verifiedMintCount,
-			zeroBalanceAccountsCount: zeroBalanceAccounts.length,
-			burnCandidateAccountsCount,
-			finalVerifiedAccountsCount: finalVerifiedAccounts.length,
+			zeroBalanceAccCount: zeroBalanceAccounts.length,
+			burnTokenAccCount,
+			VerifiedAccCount: finalVerifiedAccounts.length,
 			zeroBalanceAccounts,
 			BurnATA,
-			finalVerifiedAccounts,
-			hasMoreData
+			VerifiedAccounts: finalVerifiedAccounts,
+			hasMoreData,
 		};
 
 		return new Response(JSON.stringify(result));
