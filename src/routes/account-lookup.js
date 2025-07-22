@@ -9,7 +9,7 @@ export async function onRequestGet({ request }) {
 	if (!wallet) return new Response("Missing wallet address", { status: 400 });
 
 	try {
-		const { totalAccounts, tokenAccounts, metadata , currentPage} = await getBatchTokenAccounts(wallet);
+		const { totalAccounts, tokenAccounts, metadata } = await getBatchTokenAccounts(wallet);
 		
 		const {
 			zeroBalanceAccounts,
