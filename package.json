@@ -9,5 +9,10 @@
 	},
 	"devDependencies": {
 		"wrangler": "^4.24.3"
+	},
+	"dependencies": {
+		"@noble/ed25519": "^2.3.0",
+		"@solana/web3.js": "^1.98.2",
+		"bs58": "^6.0.0"
 	}
 }
