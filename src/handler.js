@@ -11,57 +11,69 @@
 import { getHandler } from "./router.js";
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Content-Type": "application/json",
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Headers": "*",
+	"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+	"Content-Type": "application/json",
 };
 
 export default {
-  async fetch(request, env, ctx) {
-    const { method } = request;
-    const url = new URL(request.url);
-    const path = url.pathname;
+	async fetch(request, env, ctx) {
+		const { method } = request;
+		const url = new URL(request.url);
+		const path = url.pathname;
 
-    // 🔁 Handle preflight OPTIONS requests
-    if (method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: CORS_HEADERS,
-      });
-    }
+		// 🔁 Handle preflight OPTIONS requests
+		if (method === "OPTIONS") {
+			return new Response(null, {
+				status: 204,
+				headers: CORS_HEADERS,
+			});
+		}
 
-    // 🔒 Global api key checker
-    if (env.PROJECT_MODE === "PRODUCTION") {
-      const key = request.headers.get("x-api-key");
-      if (key !== env.PRIVATE_API_KEY) {
-        return new Response("Unauthorized – Invalid API key", {
-          status: 403,
-          headers: CORS_HEADERS,
-        });
-      }
-    }
+		// 🔒 Global api key checker
+		if (env.PROJECT_MODE === "PRODUCTION") {
+			const key = request.headers.get("x-api-key");
+			if (key !== env.PRIVATE_API_KEY) {
+				return new Response("Unauthorized – Invalid API key", {
+					status: 403,
+					headers: CORS_HEADERS,
+				});
+			}
+		}
 
-    // 🔀 Route matching
-    const handler = getHandler(path);
-    if (handler && typeof handler.onRequestGet === "function") {
-      const response = await handler.onRequestGet({ request, env, ctx });
+		// 🔀 Route matching
+		const handler = getHandler(path);
 
-      // 🧠 Ensure handler response has CORS headers
-      return new Response(response.body, {
-        status: response.status || 200,
-        headers: {
-          ...CORS_HEADERS,
-          ...Object.fromEntries(response.headers || []),
-        },
-      });
-    }
+		if (handler) {
+			let response;
 
-    // 🟥 404 fallback
-    return new Response("404: Not Found", {
-      status: 404,
-      headers: CORS_HEADERS,
-    });
-  },
+			if (method === "GET" && typeof handler.onRequestGet === "function") {
+				response = await handler.onRequestGet({ request, env, ctx });
+			} else if (method === "POST" && typeof handler.onRequestPost === "function"
+			) {
+				response = await handler.onRequestPost({ request, env, ctx });
+			} else {
+				return new Response("Method Not Allowed", {
+					status: 405,
+					headers: CORS_HEADERS,
+				});
+			}
+
+			return new Response(response.body, {
+				status: response.status || 200,
+				headers: {
+					...CORS_HEADERS,
+					...Object.fromEntries(response.headers || []),
+				},
+			});
+		}
+
+
+		// 🟥 404 fallback
+		return new Response("404: Not Found", {
+			status: 404,
+			headers: CORS_HEADERS,
+		});
+	},
 };
-
