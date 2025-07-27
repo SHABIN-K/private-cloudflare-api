@@ -28,37 +28,34 @@ import getRandomSubset from "../utils/getRandomSubset";
  * @returns {Array} Array of unverified token accounts (up to 15 or less if not enough).
  */
 function getUnverifiedTokenSubset(tokenAccounts, metadata, targetCount = 15) {
-	const selected = [];
-	const seenIndexes = new Set();
+  const selected = [];
+  const seenIndexes = new Set();
 
-	// Step 1: keep selecting random tokens until we collect 15 unverified or run out
-	while (
-		selected.length < targetCount &&
-		seenIndexes.size < tokenAccounts.length
-	) {
-		// pick random tokens that haven’t been seen
-		const remaining = tokenAccounts.filter((_, i) => !seenIndexes.has(i));
-		if (remaining.length === 0) break;
+  // Step 1: keep selecting random tokens until we collect 15 unverified or run out
+  while (selected.length < targetCount && seenIndexes.size < tokenAccounts.length) {
+    // pick random tokens that haven’t been seen
+    const remaining = tokenAccounts.filter((_, i) => !seenIndexes.has(i));
+    if (remaining.length === 0) break;
 
-		const needed = targetCount - selected.length;
-		const sample = getRandomSubset(remaining, needed);
+    const needed = targetCount - selected.length;
+    const sample = getRandomSubset(remaining, needed);
 
-		for (const acc of sample) {
-			const index = tokenAccounts.indexOf(acc);
-			seenIndexes.add(index);
+    for (const acc of sample) {
+      const index = tokenAccounts.indexOf(acc);
+      seenIndexes.add(index);
 
-			const meta = metadata[acc.tokenAddress];
-			const isVerified = meta?.reputation === "ok";
+      const meta = metadata[acc.tokenAddress];
+      const isVerified = meta?.reputation === "ok";
 
-			if (!isVerified) {
-				selected.push(acc);
-			}
+      if (!isVerified) {
+        selected.push(acc);
+      }
 
-			if (selected.length === targetCount) break;
-		}
-	}
+      if (selected.length === targetCount) break;
+    }
+  }
 
-	return selected; // ✅ may return less than 15 if no more unverified
+  return selected; // ✅ may return less than 15 if no more unverified
 }
 
 export default getUnverifiedTokenSubset;
