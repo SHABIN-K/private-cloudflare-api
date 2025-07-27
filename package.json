@@ -1,18 +1,19 @@
 {
-	"name": "api@givemysolback",
-	"version": "0.0.0",
-	"private": true,
-	"scripts": {
-		"deploy": "wrangler deploy",
-		"remote": "wrangler dev --remote",
-		"start": "wrangler dev"
-	},
-	"devDependencies": {
-		"wrangler": "^4.24.3"
-	},
-	"dependencies": {
-		"@noble/ed25519": "^2.3.0",
-		"@solana/web3.js": "^1.98.2",
-		"bs58": "^6.0.0"
-	}
+  "name": "api-givemysolback",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "remote": "wrangler dev --remote",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.24.3"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.3.0",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.2",
+    "bs58": "^6.0.0"
+  }
 }
